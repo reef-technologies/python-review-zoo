@@ -68,3 +68,65 @@ class BaseMerger(object):
 ```
 
 In such case, it is strongly suggested to use the [abc metaclass](https://docs.python.org/3/library/abc.html). This way, in case you forget to implement a method in one of the children, you will get the error when the class is being read and not when the object is constructed.
+
+## variable passed directly to %
+
+see here: https://www.python.org/dev/peps/pep-0498/#rationale
+
+## invalid import order
+
+see here: http://isort.readthedocs.io/en/latest/#how-does-isort-work
+
+## catching too much
+
+Consider the following method:
+
+```python
+def download_page_with_retries(self, url):
+    retries_num = 0 
+    while retries_num <= self.retries_limit:
+        try:
+            proxy = self.get_proxy()
+            html_page, http_code = self.download_page(url, proxy)
+            if http_code == 200:
+                return html_page
+        except requests.exceptions.RequestException as e:
+            self.notice_proxy_error(proxy)
+        retires_num =+ 1
+    ...
+```
+if proxy = self.get_proxy() will one day have a new implementation which sometimes raises `requests.exceptions.RequestException`, it will be silently caught and a proxy will get downranked. Better move that line out of the `try` block. Generally try to keep as little as possible in there to avoid catching something accidentally.
+
+## formatting logs
+
+Consider the following line:
+
+```
+logging.info("Spawned thread: {}".format(thread.name))
+```
+potentially expensive `format()` should only be called in case log level is set in a way that allows the given log statement to be emitted. `logging.info("Spawned thread: %s", thread.name)` uses `%` only if necessary.
+
+## django order_by annotation phenomenon
+
+```pycon
+>>> list(SomeModel.objects.values('code').annotate(points=Count('date')).values_list('code', 'points'))
+[('some_code', 1), ('some_code', 1), ('some_code', 1)]
+```
+but:
+```pycon
+>>> list(SomeModel.objects.order_by().values('code').annotate(points=Count('date')).values_list('code', 'points'))
+[('some_code', 3)]
+```
+(`.values(...).annotate(...)` is a Django idiom for `GROUP BY`, and `Count('date')` counts rows with `NOT NULL` `date` column)
+
+what is happening is inside `SomeModel.Meta`:
+```
+ordering = ['other', 'date']
+```
+and Django automatically adds, those to `GROUP BY` to be able to `ORDER BY` those fields
+
+What is even worse - `other` is a `models.ForeignKey(OtherModel)` field and `OtherModel.Meta` has `ordering = ['name']` - so Django automatically `JOIN` tables to acquire `other__name` and is ordering by this field
+
+Therefore:
+- clean up ordering by `.order_by()` before `.values(...).annotate(...)` `GROUP BY` pattern
+- maybe don't use `Meta.ordering`?
