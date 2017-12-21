@@ -130,3 +130,40 @@ What is even worse - `other` is a `models.ForeignKey(OtherModel)` field and `Oth
 Therefore:
 - clean up ordering by `.order_by()` before `.values(...).annotate(...)` `GROUP BY` pattern
 - maybe don't use `Meta.ordering`?
+
+## raising Exception with a message
+
+Consider the following method:
+
+```python
+def get_proxy(self):
+    with self.lock:
+        if len(self.proxies) > 0:
+            return random.sample(self.proxies, 1)[0]
+        else:
+            raise Exception("Lack of working proxies")
+```
+
+the only way to catch this is to `except Exception`. Please don't force the user of this class to do this. Inherit from `Exception` like this:
+
+```python
+class YourModuleException(Exception):
+    pass
+
+class NoViableProxies(YourModuleException):
+    pass
+```
+then the user can catch all of your exceptions or just the one and handle it appropriately.
+
+## formatting logs
+
+Consider the following code snippet:
+
+```python
+if response_html is None: 
+    logging.info(
+        "Aborting search for keyword: %s. Cannot download this page",
+        job.start_url
+    )
+```
+When the log template line will be extended to accept another parameter, `job.start_url` line has to be deleted and re-added with a `,` after it. This may not be very bad, but it makes it harder for the reviewer to see what the change is about. If the trailing comma was provided, the diff would show the template change and then a line added. Therefore, end the multi-line function calls with a trailing comma. The same also applies to lists, sets, dicts and so on, when they are created in multiple lines.
