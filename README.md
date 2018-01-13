@@ -167,3 +167,23 @@ if response_html is None:
     )
 ```
 When the log template line will be extended to accept another parameter, `job.start_url` line has to be deleted and re-added with a `,` after it. This may not be very bad, but it makes it harder for the reviewer to see what the change is about. If the trailing comma was provided, the diff would show the template change and then a line added. Therefore, end the multi-line function calls with a trailing comma. The same also applies to lists, sets, dicts and so on, when they are created in multiple lines.
+
+
+## usage of itertools chain
+
+Consider the following code snippets:
+
+```python
+
+for app_node in itertools.chain(*self._app_nodes.values()):
+    app_node.destroy()
+
+```
+
+
+```python
+for app_nodes in self._app_nodes.values():
+    for app_node in app_nodes:
+        app_node.destroy()
+```
+2-nested loop is not so bad, itertools.chain and tuple unfolding version of the code is correct (aldough it consumes more memory), but which version would you prefer to support at 3:43 AM when a production system is crashing and burning and you were woken up by a monitoring operator to fix it? I know I would go with the nested loop, it doesn't make me think as much as the first one.
