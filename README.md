@@ -187,3 +187,8 @@ for app_nodes in self._app_nodes.values():
         app_node.destroy()
 ```
 2-nested loop is not so bad, itertools.chain and tuple unfolding version of the code is correct (aldough it consumes more memory), but which version would you prefer to support at 3:43 AM when a production system is crashing and burning and you were woken up by a monitoring operator to fix it? I know I would go with the nested loop, it doesn't make me think as much as the first one.
+
+## quite a few well-described anti-patterns
+
+https://docs.quantifiedcode.com/python-anti-patterns/correctness/index.html
+
