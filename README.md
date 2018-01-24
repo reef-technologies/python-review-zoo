@@ -192,3 +192,11 @@ for app_nodes in self._app_nodes.values():
 
 https://docs.quantifiedcode.com/python-anti-patterns/correctness/index.html
 
+## Requests timeout
+
+Remember to set `timeout` in all requests in production code.
+
+http://docs.python-requests.org/en/master/user/quickstart/#timeouts
+http://docs.python-requests.org/en/master/user/advanced/#timeouts
+
+
