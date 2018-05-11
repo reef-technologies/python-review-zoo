@@ -188,6 +188,48 @@ for app_nodes in self._app_nodes.values():
 ```
 2-nested loop is not so bad, itertools.chain and tuple unfolding version of the code is correct (aldough it consumes more memory), but which version would you prefer to support at 3:43 AM when a production system is crashing and burning and you were woken up by a monitoring operator to fix it? I know I would go with the nested loop, it doesn't make me think as much as the first one.
 
+## manual memoization 
+
+```python
+
+class A:
+    def __init__(self):
+        self._cached_value = None
+    @property
+    def b(self):
+        if self._cached_value is None:
+            print('generating')
+            self._cached_value = self._helper_method()
+        return self._cached_value
+```
+
+vs
+
+```
+class A:
+    @property
+    @functools.lru_cache(1)
+    def b(self):
+        print('generating')
+        return self._helper_method()
+```
+(actually the helper method could be inlined here, making the code even cleaner)
+
+This is how it works:
+```pycon
+>>> a = A()
+>>> a.b
+generating
+123
+>>> a.b
+123
+>>> a.b
+123
+>>> 
+```
+while it uses slightly more memory than the first version, it makes the code much cleaner.
+
+
 ## quite a few well-described anti-patterns
 
 https://docs.quantifiedcode.com/python-anti-patterns/correctness/index.html
