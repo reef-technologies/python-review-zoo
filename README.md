@@ -229,6 +229,13 @@ generating
 ```
 while it uses slightly more memory than the first version, it makes the code much cleaner.
 
+## how to efficiently check if a loop was entered or not
+
+http://python-notes.curiousefficiency.org/en/latest/python_concepts/break_else.html#but-how-do-i-check-if-my-loop-never-ran-at-all
+
+and
+
+https://github.com/bleachbit/bleachbit/commit/a5cbfbcec7705c35bd96792bb06d70fea125985c
 
 ## quite a few well-described anti-patterns
 
