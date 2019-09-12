@@ -52,7 +52,7 @@ From python docs `mkstemp() and mkdtemp() are lower-level functions which requir
 
 `fd` here is left dangling. See `https://docs.python.org/3/library/os.html#os.close` - file descriptors opened by `tempfile.mkstemp()` need to be closed manually or they leak. If you will cross the limit of open file descriptors on your system (usually 1024 per user), you'll start getting random errors.
 
-Also, you don't provide any prefix or suffix to mkstemp. If your program dies unexpectedely, a file will be left in `/tmp` and it will be hard to distinguish it from other files that might be needed for something. Please provide a prefix.
+Also, you don't provide any prefix or suffix to `mkstemp`. If your program dies unexpectedely, a file will be left in `/tmp` and it will be hard to distinguish it from other files that might be needed for something. Please provide a prefix.
 
 ## NotImplementedError
 
@@ -95,13 +95,13 @@ def download_page_with_retries(self, url):
         retires_num =+ 1
     ...
 ```
-if proxy = self.get_proxy() will one day have a new implementation which sometimes raises `requests.exceptions.RequestException`, it will be silently caught and a proxy will get downranked. Better move that line out of the `try` block. Generally try to keep as little as possible in there to avoid catching something accidentally.
+if `proxy = self.get_proxy()` will one day have a new implementation which sometimes raises `requests.exceptions.RequestException`, it will be silently caught and a proxy will get downranked. Better move that line out of the `try` block. Generally try to keep as little as possible in there to avoid catching something accidentally.
 
 ## formatting logs
 
 Consider the following line:
 
-```
+```python
 logging.info("Spawned thread: {}".format(thread.name))
 ```
 potentially expensive `format()` should only be called in case log level is set in a way that allows the given log statement to be emitted. `logging.info("Spawned thread: %s", thread.name)` uses `%` only if necessary.
@@ -144,7 +144,7 @@ def get_proxy(self):
             raise Exception("Lack of working proxies")
 ```
 
-the only way to catch this is to `except Exception`. Please don't force the user of this class to do this. Inherit from `Exception` like this:
+the only way to catch this is to `except Exception`, compare the string and re-raise if we caught the wrong thing. Please don't force the user of this class to do this. Instead, inherit from `Exception` like this:
 
 ```python
 class YourModuleException(Exception):
@@ -155,7 +155,7 @@ class NoViableProxies(YourModuleException):
 ```
 then the user can catch all of your exceptions or just the one and handle it appropriately.
 
-## formatting logs
+## formatting multiline statements
 
 Consider the following code snippet:
 
@@ -166,7 +166,7 @@ if response_html is None:
         job.start_url
     )
 ```
-When the log template line will be extended to accept another parameter, `job.start_url` line has to be deleted and re-added with a `,` after it. This may not be very bad, but it makes it harder for the reviewer to see what the change is about. If the trailing comma was provided, the diff would show the template change and then a line added. Therefore, end the multi-line function calls with a trailing comma. The same also applies to lists, sets, dicts and so on, when they are created in multiple lines.
+When the log template line will be extended to accept another parameter, `job.start_url` line has to be deleted and re-added with a `,` after it. This may not be very bad, but it makes it harder for the reviewer to see what the change is about. If the trailing comma was provided, the diff would show the template change and then a line added. Therefore, end the multi-line function calls with a trailing comma. The same **also applies to lists, sets, dicts and so on**, when they are created in multiple lines.
 
 
 ## usage of itertools chain
@@ -205,7 +205,7 @@ class A:
 
 vs
 
-```
+```python
 class A:
     @property
     @functools.lru_cache(1)
@@ -250,3 +250,10 @@ http://docs.python-requests.org/en/master/user/quickstart/#timeouts
 http://docs.python-requests.org/en/master/user/advanced/#timeouts
 
 
+## Usage of __subclass__
+
+This language feature is an accident: https://mail.python.org/pipermail/python-list/2003-August/210297.html
+
+It's dangerous, because if you'd like to subclass an interface in an incompatible way but a (possibly indirect (if recursive)) parent uses this in a classmethod to generate something like a registry, but you've added a mandatory function argument, the parent will crash. This is really funny if the parents add the classmethod in a version that is created _after_ you have subclassed and then it crashes your deployment even if both sides use best practices for versioning such as SemVer and appropriate version pinning.
+
+Instead, explicitly use a decorator to register. We usually use https://class-registry.readthedocs.io/en/latest/iterating_over_registries.html
