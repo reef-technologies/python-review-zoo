@@ -249,6 +249,12 @@ http://docs.python-requests.org/en/master/user/quickstart/#timeouts
 
 http://docs.python-requests.org/en/master/user/advanced/#timeouts
 
+## usage of @staticmethod
+
+Guido van Rossum, python BDFL, [wrote](https://mail.python.org/pipermail/python-ideas/2012-May/014969.html) this about `staticmethods`: 
+> They're basically an accident -- back in the Python 2.2 days when I was inventing new-style classes and descriptors, I meant to implement class methods but at first I didn't understand them and accidentally implemented static methods first. Then it was too late to remove them and only provide class methods.
+
+Generally, whenever there is a temptation to use `@staticmethod`, just use `@classmethod` instead (and if it doesn't work, speak up on `#default`, someone will help you).
 
 ## Usage of __subclass__
 
