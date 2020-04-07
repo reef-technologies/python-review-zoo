@@ -256,7 +256,7 @@ Guido van Rossum, python BDFL, [wrote](https://mail.python.org/pipermail/python-
 
 Generally, whenever there is a temptation to use `@staticmethod`, just use `@classmethod` instead (and if it doesn't work, speak up on `#default`, someone will help you).
 
-## Usage of __subclass__
+## Usage of `__subclass__`
 
 This language feature is an accident: https://mail.python.org/pipermail/python-list/2003-August/210297.html
 
