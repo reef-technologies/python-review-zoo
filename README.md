@@ -207,8 +207,7 @@ vs
 
 ```python
 class A:
-    @property
-    @functools.lru_cache(1)
+    @functools.cached_property
     def b(self):
         print('generating')
         return self._helper_method()
