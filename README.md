@@ -106,6 +106,13 @@ logging.info("Spawned thread: {}".format(thread.name))
 ```
 potentially expensive `format()` should only be called in case log level is set in a way that allows the given log statement to be emitted. `logging.info("Spawned thread: %s", thread.name)` uses `%` only if necessary.
 
+## django default model ordering
+
+Technically we may want to use it one day, but so far every single time we've seen it used, it was excessive and would unnecessairly sort where it's not needed, often missing an index.
+
+Specifically if you have column `a` that you have an index on, and you enable ordering on that column, and you have a column `b` where you have an index, but you'll query with a filter on `b`, then postgres can either filter by `b` and sort in memory or use the sorting from `a` and do a full-scan filtering on `b`. This is all fine if you really need it, but often times when you write `Something.objects.filter(b=...)` you don't really need `.order_by('a')` and asking everyone to remember to disable the sorting by `.order_by()` to override the sorting inherited from the model does not sound like a very good idea.
+
+
 ## django order_by annotation phenomenon
 
 ```pycon
