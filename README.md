@@ -251,9 +251,9 @@ https://docs.quantifiedcode.com/python-anti-patterns/correctness/index.html
 
 Remember to set `timeout` in all requests in production code.
 
-http://docs.python-requests.org/en/master/user/quickstart/#timeouts
+https://requests.readthedocs.io/en/latest/user/quickstart/#timeouts
 
-http://docs.python-requests.org/en/master/user/advanced/#timeouts
+https://requests.readthedocs.io/en/latest/user/advanced/#timeouts
 
 ## usage of @staticmethod
 
