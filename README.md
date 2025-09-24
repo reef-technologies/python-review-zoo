@@ -27,7 +27,7 @@ if __name__ == "__main__":
     main()
 ```
 
-In such case, it is strongly suggested to use [argparse](https://docs.python.org/3/library/argparse.html). Unless you are referencing `sys.argv[1]` in a one-off script, you should always use argparse to accept command line arguments.
+In such case, it is strongly suggested to use [argparse](https://docs.python.org/3/library/argparse.html). Unless you are referencing `sys.argv[1]` in a one-off script, you should always use argparse to accept command line arguments or consider using fully featured libraries for CLI building. One recommended one is [Click](https://click.palletsprojects.com/en/stable/)
 
 
 ## usage of `mkstemp`
